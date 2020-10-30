@@ -1,6 +1,7 @@
 package com.ibar.springbootexternalapi.service;
 
 import com.ibar.springbootexternalapi.entity.ApiResponse;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +21,12 @@ public class ApiService {
         return restTemplate.getForObject(apiUrl, String.class);
     }
 
+    @HystrixCommand(fallbackMethod = "defaultMethod")
     public ResponseEntity<ApiResponse> getWithOwnEntity(){
-        ResponseEntity<ApiResponse> responseEntity = restTemplate.getForEntity(apiUrl, ApiResponse.class);
-        return responseEntity;
+        return restTemplate.getForEntity(apiUrl, ApiResponse.class);
+    }
+
+    private ResponseEntity<ApiResponse> defaultMethod() {
+        return ResponseEntity.ok(new ApiResponse());
     }
 }
